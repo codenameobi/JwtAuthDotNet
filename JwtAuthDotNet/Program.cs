@@ -1,3 +1,5 @@
+using JwtAuthDotNet.Data.Data;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddAuthorization();
+
+builder.Services.AddDbContext<UserDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
 
 
 var app = builder.Build();
