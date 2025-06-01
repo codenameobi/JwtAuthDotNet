@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using JwtAuthDotNet.Data.Dtos;
@@ -42,7 +43,31 @@ public class AuthController(IConfiguration configuration) : ControllerBase
                 return BadRequest("Wrong username / password.");
             }
 
-            string token = "success";
+            string token = CreateToken(user);
             return Ok(token);
     }
+    
+    private string CreateToken(User user)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Username)
+        };
+
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
+
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+
+        var tokenDescriptor = new JwtSecurityToken(
+            issuer: configuration.GetValue<string>("AppSettings:Issuer"),
+            audience: configuration.GetValue<string>("AppSettings:Audience"),
+            claims: claims,
+            expires: DateTime.UtcNow.AddDays(1),
+            signingCredentials: creds
+            );
+
+        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+    }
+    
 }
