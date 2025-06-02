@@ -1,4 +1,5 @@
 using JwtAuthDotNet.Data.Data;
+using JwtAuthDotNet.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -12,6 +13,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 var app = builder.Build();
